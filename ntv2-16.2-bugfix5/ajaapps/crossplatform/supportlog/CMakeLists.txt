@@ -1,0 +1,43 @@
+project(supportlog)
+
+set(SUPPORTLOG_TARGET_INCLUDE_DIRS
+	${CMAKE_CURRENT_SOURCE_DIR}/../
+	${AJA_LIBRARIES_ROOT}
+	${AJA_LIB_NTV2_ROOT}/includes)
+
+set(SUPPORTLOG_SOURCES
+    main.cpp)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	# noop
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	find_library(FOUNDATION_FRAMEWORK Foundation)
+	set(TARGET_LINK_LIBS ${FOUNDATION_FRAMEWORK})
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	set(TARGET_LINK_LIBS dl pthread rt)
+endif()
+
+set(SUPPORTLOG_TARGET_SOURCES
+	${SUPPORTLOG_SOURCES})
+
+add_executable(supportlog ${SUPPORTLOG_TARGET_SOURCES})
+add_dependencies(supportlog ajantv2)
+target_include_directories(supportlog PUBLIC ${SUPPORTLOG_TARGET_INCLUDE_DIRS})
+target_link_libraries(supportlog PUBLIC ajantv2 ${TARGET_LINK_LIBS})
+
+if (AJA_INSTALL_SOURCES)
+	install(FILES ${SUPPORTLOG_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/supportlog)
+	install(FILES ${SUPPORTLOG_SOURCES} DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/supportlog)
+	install(FILES CMakeLists.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/supportlog)
+endif()
+
+install(TARGETS supportlog
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+if (AJA_CODE_SIGN)
+    aja_code_sign(supportlog)
+endif()

@@ -1,0 +1,45 @@
+project(logreader)
+
+set(LOGREADER_TARGET_INCLUDE_DIRS
+	${CMAKE_CURRENT_SOURCE_DIR}/../
+	${AJA_LIBRARIES_ROOT}
+	${AJA_LIB_NTV2_ROOT}/includes)
+
+set(LOGREADER_SOURCES main.cpp)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	# noop
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	find_library(FOUNDATION_FRAMEWORK Foundation)
+	set(TARGET_LINK_LIBS ${FOUNDATION_FRAMEWORK})
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	set(TARGET_LINK_LIBS dl pthread rt)
+endif()
+
+set(LOGREADER_TARGET_SOURCES
+	${LOGREADER_SOURCES})
+
+add_executable(logreader ${LOGREADER_TARGET_SOURCES})
+add_dependencies(logreader ajantv2)
+target_include_directories(logreader PUBLIC ${LOGREADER_TARGET_INCLUDE_DIRS})
+target_link_libraries(logreader PUBLIC ajantv2 ${TARGET_LINK_LIBS})
+
+if (AJA_INSTALL_SOURCES)
+	install(FILES ${LOGREADER_SOURCES} DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/logreader)
+endif()
+
+if (AJA_INSTALL_SOURCES)
+	install(FILES ${LOGREADER_SOURCES} DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/logreader)
+	install(FILES CMakeLists.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/ajaapps/crossplatform/logreader)
+endif()
+
+install(TARGETS logreader
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+if (AJA_CODE_SIGN)
+    aja_code_sign(logreader)
+endif()
