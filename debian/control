@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9), cdbs, cmake, git, libx11-dev, libgl1-mesa-dev |
 Homepage: http://obsproject.org
 
 Package: obs-studio
-Architecture: amd64
+Architecture: arm64
 Depends: ${shlibs:Depends}, ${misc:Depends}, qtwayland5
 Conflicts: libobs0, obs-plugins
 Description: OBS Studio for Ubuntu 
